@@ -79,10 +79,23 @@ var colors = [
     "#D7DBDD"
 ]
 
+var currentNumber = 0;
+
+var quotesJSON = []
+
 $(document).ready(() => {
+    fetch("https://type.fit/api/quotes")
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        console.log(data);
+        quotesJSON = data;
+        getRandomQuote(quotesJSON)
+    });
     setInterval(() => {
-        getRandomQuote()
-    }, 2000);
+        getRandomQuote(quotesJSON)
+    }, 5000);
 })
 
 
@@ -106,26 +119,28 @@ $(document).ready(() => {
 //     }
 // }
 
-function getRandomQuote(){
-    var randomNumForQuotes = getRandomNumber(0, 10)
+function getRandomQuote(data){
 
-    const selectedQuote =  jsonQuotes.find( q => q.id == randomNumForQuotes);
+    var randomNumForQuotes = getRandomNumber(0, data.length)
+
+    const selectedQuote =  data.find( (q, index) => index == randomNumForQuotes);
     var randomNumForColors = getRandomNumber(0, 10)
-    $('#quotetext').text(selectedQuote.quote)
+    $('#quotetext').text(selectedQuote.text)
     // $('#quotetext').css(`color:${colors[randomNumForColors]}`)
     $('#quote-box').css("background-color", `${colors[randomNumForColors]}`)
     // $('body').css("background-color", `${colors[randomNumForColors]}`)
-
+    $('.add-quote').css('background-color', `${colors[randomNumForColors]}`)
     $('#quote-box').css("box-shadow", "5px 5px 8px #000")
     $('#quoteauthor').text( "-" + selectedQuote.author)
 }
 
 function getRandomNumber(num1, num2){
-    var number = 0;
+    var generatedNumber = 0;
     do{
-        number = (Math.floor( Math.random() * 10));
+        generatedNumber = (Math.floor( Math.random() * 10));
     }
-    while(number != num1 && number > num2)
+    while(generatedNumber != num1 && generatedNumber > num2 && generatedNumber > currentNumber)
 
-    return number;
+    currentNumber = generatedNumber
+    return generatedNumber;
 }
